@@ -32,6 +32,7 @@ import (
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/services/dns"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/services/eventgrid"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/services/eventhub"
+	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/services/example"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/services/frontdoor"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/services/hdinsight"
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/internal/services/healthcare"
@@ -117,6 +118,7 @@ func SupportedServices() []common.ServiceRegistration {
 		devspace.Registration{},
 		devtestlabs.Registration{},
 		dns.Registration{},
+		example.Registration{},
 		eventgrid.Registration{},
 		eventhub.Registration{},
 		frontdoor.Registration{},
