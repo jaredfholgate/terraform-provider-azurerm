@@ -88,6 +88,12 @@ import (
 
 //go:generate go run ../tools/generator-services/main.go -path=../../../
 
+func SupportedTypedServices() []sdk.TypedServiceRegistration {
+	return []sdk.TypedServiceRegistration{
+		example.Registration{},
+	}
+}
+
 func SupportedUntypedServices() []sdk.UntypedServiceRegistration {
 	return []sdk.UntypedServiceRegistration{
 		advisor.Registration{},
@@ -118,7 +124,6 @@ func SupportedUntypedServices() []sdk.UntypedServiceRegistration {
 		devspace.Registration{},
 		devtestlabs.Registration{},
 		dns.Registration{},
-		example.Registration{},
 		eventgrid.Registration{},
 		eventhub.Registration{},
 		frontdoor.Registration{},
