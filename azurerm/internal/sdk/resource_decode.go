@@ -100,7 +100,7 @@ func setValue(input, hclValue interface{}, index int, debugLogger Logger) error 
 			mapOutput.SetMapIndex(reflect.ValueOf(key), reflect.ValueOf(val))
 		}
 
-		// TODO Tom, is this how we want to do this?
+		// TODO: should we always set this in the future? tests pass so it seems fine
 		if len(mapConfig) > 0 {
 			reflect.ValueOf(input).Elem().Field(index).Set(mapOutput)
 		}
@@ -117,7 +117,6 @@ func setValue(input, hclValue interface{}, index int, debugLogger Logger) error 
 
 func setListValue(input interface{}, index int, v []interface{}, debugLogger Logger) {
 	switch fieldType := reflect.ValueOf(input).Elem().Field(index).Type(); fieldType {
-	// TODO do I have to do it this way for the rest of the types?
 	case reflect.TypeOf([]string{}):
 		stringSlice := reflect.MakeSlice(reflect.TypeOf([]string{}), len(v), len(v))
 		for i, stringVal := range v {
@@ -147,7 +146,7 @@ func setListValue(input interface{}, index int, v []interface{}, debugLogger Log
 		reflect.ValueOf(input).Elem().Field(index).Set(bSlice)
 
 	default:
-		valueToSet := reflect.New(reflect.ValueOf(input).Elem().Field(index).Type())
+		valueToSet := reflect.MakeSlice(reflect.ValueOf(input).Elem().Field(index).Type(), 0, 0)
 		debugLogger.Infof("List Type", valueToSet.Type())
 
 		for _, mapVal := range v {
@@ -165,6 +164,7 @@ func setListValue(input interface{}, index int, v []interface{}, debugLogger Log
 
 					if val, exists := nestedField.Tag.Lookup("hcl"); exists {
 						nestedHCLValue := test[val]
+						// todo check error
 						setValue(elem.Interface(), nestedHCLValue, j, debugLogger)
 					}
 				}
@@ -182,12 +182,9 @@ func setListValue(input interface{}, index int, v []interface{}, debugLogger Log
 				debugLogger.Infof("value to set type after changes", valueToSet.Type())
 			}
 		}
-		fieldToSet := reflect.ValueOf(input).Elem().Field(index)
 
-		if valueToSet.Kind() != reflect.Ptr {
-			fieldToSet.Set(valueToSet)
-		} else {
-			fieldToSet.Set(valueToSet.Elem())
-		}
+		valueToSet = reflect.Indirect(valueToSet)
+		fieldToSet := reflect.ValueOf(input).Elem().Field(index)
+		fieldToSet.Set(reflect.Indirect(valueToSet))
 	}
 }

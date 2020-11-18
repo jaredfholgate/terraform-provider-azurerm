@@ -9,7 +9,7 @@ import (
 
 type encodeTestData struct {
 	Input       interface{}
-	Expected    *map[string]interface{}
+	Expected    map[string]interface{}
 	ExpectError bool
 }
 
@@ -58,7 +58,7 @@ func TestResourceEncode_TopLevel(t *testing.T) {
 				"morning": "alvaro",
 			},
 		},
-		Expected: &map[string]interface{}{
+		Expected: map[string]interface{}{
 			"number":  int64(42),
 			"price":   float64(129.99),
 			"string":  "world",
@@ -107,7 +107,7 @@ func TestResourceEncode_TopLevelOmitted(t *testing.T) {
 	}
 	encodeTestData{
 		Input: &SimpleType{},
-		Expected: &map[string]interface{}{
+		Expected: map[string]interface{}{
 			"number":          int64(0),
 			"price":           float64(0),
 			"string":          "",
@@ -163,7 +163,7 @@ func TestResourceEncode_TopLevelComputed(t *testing.T) {
 				"bingo": "bango",
 			},
 		},
-		Expected: &map[string]interface{}{
+		Expected: map[string]interface{}{
 			"computed_string":          "je suis computed",
 			"computed_number":          int64(732),
 			"computed_bool":            true,
@@ -173,7 +173,7 @@ func TestResourceEncode_TopLevelComputed(t *testing.T) {
 				"you",
 				"heard",
 			},
-			"computed_map_of_bool": map[string]interface{}{
+			"computed_map_of_bools": map[string]interface{}{
 				"hello": true,
 				"world": false,
 			},
@@ -181,12 +181,12 @@ func TestResourceEncode_TopLevelComputed(t *testing.T) {
 				"hello": 1.8965345678,
 				"world": 2.0,
 			},
-			"computed_map_of_int": map[string]interface{}{
+			"computed_map_of_ints": map[string]interface{}{
 				"first":  1,
 				"second": 2,
 				"third":  3,
 			},
-			"computed_map_of_string": map[string]interface{}{
+			"computed_map_of_strings": map[string]interface{}{
 				"hello": "world",
 				"bingo": "bango",
 			},
@@ -205,7 +205,7 @@ func TestResourceEncode_NestedOneLevelDeepEmpty(t *testing.T) {
 		Input: &Type{
 			NestedObject: []Inner{},
 		},
-		Expected: &map[string]interface{}{
+		Expected: map[string]interface{}{
 			"inner": []interface{}{},
 		},
 	}.test(t)
@@ -262,9 +262,9 @@ func TestResourceEncode_NestedOneLevelDeepSingle(t *testing.T) {
 				},
 			},
 		},
-		Expected: &map[string]interface{}{
+		Expected: map[string]interface{}{
 			"inner": []interface{}{
-				&map[string]interface{}{
+				map[string]interface{}{
 					"number":  int64(42),
 					"price":   float64(129.99),
 					"string":  "world",
@@ -326,10 +326,9 @@ func TestResourceEncode_NestedOneLevelDeepSingleOmittedValues(t *testing.T) {
 				{},
 			},
 		},
-		Expected: &map[string]interface{}{
+		Expected: map[string]interface{}{
 			"inner": []interface{}{
-				// TODO: can we remove the pointer here, and return the value directly? (and on the others)
-				&map[string]interface{}{
+				map[string]interface{}{
 					"number":                 int64(0),
 					"price":                  float64(0),
 					"string":                 "",
@@ -340,10 +339,10 @@ func TestResourceEncode_NestedOneLevelDeepSingleOmittedValues(t *testing.T) {
 					"map_of_bools":           map[string]interface{}{},
 					"map_of_numbers":         map[string]interface{}{},
 					"map_of_strings":         map[string]interface{}{},
-					"computed_map_of_bool":   map[string]interface{}{},
+					"computed_map_of_bools":   map[string]interface{}{},
 					"computed_map_of_floats": map[string]interface{}{},
-					"computed_map_of_int":    map[string]interface{}{},
-					"computed_map_of_string": map[string]interface{}{},
+					"computed_map_of_ints":    map[string]interface{}{},
+					"computed_map_of_strings": map[string]interface{}{},
 				},
 			},
 		},
@@ -371,15 +370,15 @@ func TestResourceEncode_NestedOneLevelDeepSingleMultiple(t *testing.T) {
 				},
 			},
 		},
-		Expected: &map[string]interface{}{
+		Expected: map[string]interface{}{
 			"inner": []interface{}{
-				&map[string]interface{}{
+				map[string]interface{}{
 					"value": "first",
 				},
-				&map[string]interface{}{
+				map[string]interface{}{
 					"value": "second",
 				},
-				&map[string]interface{}{
+				map[string]interface{}{
 					"value": "third",
 				},
 			},
@@ -406,7 +405,7 @@ func TestResourceEncode_NestedThreeLevelsDeepEmpty(t *testing.T) {
 		Input: &Type{
 			First: []FirstInner{},
 		},
-		Expected: &map[string]interface{}{
+		Expected: map[string]interface{}{
 			"first": []interface{}{},
 		},
 	}.test(t)
@@ -420,9 +419,9 @@ func TestResourceEncode_NestedThreeLevelsDeepEmpty(t *testing.T) {
 				},
 			},
 		},
-		Expected: &map[string]interface{}{
+		Expected: map[string]interface{}{
 			"first": []interface{}{
-				&map[string]interface{}{
+				map[string]interface{}{
 					"second": []interface{}{},
 				},
 			},
@@ -442,11 +441,11 @@ func TestResourceEncode_NestedThreeLevelsDeepEmpty(t *testing.T) {
 				},
 			},
 		},
-		Expected: &map[string]interface{}{
+		Expected: map[string]interface{}{
 			"first": []interface{}{
-				&map[string]interface{}{
+				map[string]interface{}{
 					"second": []interface{}{
-						&map[string]interface{}{
+						map[string]interface{}{
 							"third": []interface{}{},
 						},
 					},
@@ -486,13 +485,13 @@ func TestResourceEncode_NestedThreeLevelsDeepSingleItem(t *testing.T) {
 				},
 			},
 		},
-		Expected: &map[string]interface{}{
+		Expected: map[string]interface{}{
 			"first": []interface{}{
-				&map[string]interface{}{
+				map[string]interface{}{
 					"second": []interface{}{
-						&map[string]interface{}{
+						map[string]interface{}{
 							"third": []interface{}{
-								&map[string]interface{}{
+								map[string]interface{}{
 									"value": "salut",
 								},
 							},
@@ -582,59 +581,59 @@ func TestResourceEncode_NestedThreeLevelsDeepMultipleItems(t *testing.T) {
 				},
 			},
 		},
-		Expected: &map[string]interface{}{
+		Expected: map[string]interface{}{
 			"first": []interface{}{
-				&map[string]interface{}{
+				map[string]interface{}{
 					"value": "first - 1",
 					"second": []interface{}{
-						&map[string]interface{}{
+						map[string]interface{}{
 							"value": "second - 1",
 							"third": []interface{}{
-								&map[string]interface{}{
+								map[string]interface{}{
 									"value": "third - 1",
 								},
-								&map[string]interface{}{
+								map[string]interface{}{
 									"value": "third - 2",
 								},
-								&map[string]interface{}{
+								map[string]interface{}{
 									"value": "third - 3",
 								},
 							},
 						},
-						&map[string]interface{}{
+						map[string]interface{}{
 							"value": "second - 2",
 							"third": []interface{}{
-								&map[string]interface{}{
+								map[string]interface{}{
 									"value": "third - 4",
 								},
-								&map[string]interface{}{
+								map[string]interface{}{
 									"value": "third - 5",
 								},
-								&map[string]interface{}{
+								map[string]interface{}{
 									"value": "third - 6",
 								},
 							},
 						},
 					},
 				},
-				&map[string]interface{}{
+				map[string]interface{}{
 					"value": "first - 2",
 					"second": []interface{}{
-						&map[string]interface{}{
+						map[string]interface{}{
 							"value": "second - 3",
 							"third": []interface{}{
-								&map[string]interface{}{
+								map[string]interface{}{
 									"value": "third - 7",
 								},
-								&map[string]interface{}{
+								map[string]interface{}{
 									"value": "third - 8",
 								},
 							},
 						},
-						&map[string]interface{}{
+						map[string]interface{}{
 							"value": "second - 4",
 							"third": []interface{}{
-								&map[string]interface{}{
+								map[string]interface{}{
 									"value": "third - 9",
 								},
 							},
@@ -664,7 +663,7 @@ func (testData encodeTestData) test(t *testing.T) {
 		t.Fatalf("expected an error but didn't get one!")
 	}
 
-	if !cmp.Equal(*output, *testData.Expected) {
-		t.Fatalf("Output mismatch:\n\n Expected: %+v\n\n Received: %+v\n\n", *testData.Expected, *output)
+	if !cmp.Equal(output, testData.Expected) {
+		t.Fatalf("Output mismatch:\n\n Expected: %+v\n\n Received: %+v\n\n", testData.Expected, output)
 	}
 }

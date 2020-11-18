@@ -70,6 +70,7 @@ func TestDecode_TopLevelFieldsRequired(t *testing.T) {
 			String:  "world",
 			Price:   129.99,
 			Enabled: true,
+			Number: 42,
 			ListOfFloats: []float64{
 				1.0,
 				2.0,
@@ -177,7 +178,7 @@ func TestResourceDecode_NestedOneLevelDeepEmpty(t *testing.T) {
 		Expected: &Type{
 			// Tom, commenting out the below line causes the test to pass. Because, we're passing an empty thing
 			// do we want nothing to be passed into the struct?
-			//NestedObject: []Inner{}, // TODO: has to be `[]Inner(nil)` right now
+			NestedObject: []Inner{}, // TODO: has to be `[]Inner(nil)` right now
 		},
 	}.test(t)
 }
@@ -410,7 +411,7 @@ func TestResourceDecode_NestedThreeLevelsDeepEmpty(t *testing.T) {
 			},
 		},
 		Input: &Type{},
-		Expected: Type{
+		Expected: &Type{
 			First: []FirstInner{
 				{
 					Second: []SecondInner{

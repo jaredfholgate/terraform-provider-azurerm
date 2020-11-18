@@ -18,7 +18,7 @@ func (rmd *ResourceMetaData) Encode(input interface{}) error {
 		return err
 	}
 
-	for k, v := range *serialized {
+	for k, v := range serialized {
 		if err := rmd.ResourceData.Set(k, v); err != nil {
 			return fmt.Errorf("settting %q: %+v", k, err)
 		}
@@ -26,7 +26,7 @@ func (rmd *ResourceMetaData) Encode(input interface{}) error {
 	return nil
 }
 
-func recurse(objType reflect.Type, objVal reflect.Value, debugLogger Logger) (*map[string]interface{}, error) {
+func recurse(objType reflect.Type, objVal reflect.Value, debugLogger Logger) (map[string]interface{}, error) {
 	output := make(map[string]interface{}, 0)
 	for i := 0; i < objType.NumField(); i++ {
 		field := objType.Field(i)
@@ -99,11 +99,6 @@ func recurse(objType reflect.Type, objVal reflect.Value, debugLogger Logger) (*m
 						output[hclTag] = make([]bool, 0)
 					}
 
-				case reflect.TypeOf([]bool{}):
-					debugLogger.Infof("Setting %q to %q", hclTag, sv)
-					debugLogger.Infof("Interface type is %+v", sv.Interface())
-					output[hclTag] = sv.Interface()
-
 				default:
 					for i := 0; i < sv.Len(); i++ {
 						debugLogger.Infof("[SLICE] Index %d is %q", i, sv.Index(i).Interface())
@@ -120,10 +115,10 @@ func recurse(objType reflect.Type, objVal reflect.Value, debugLogger Logger) (*m
 					output[hclTag] = attr
 				}
 			default:
-				return &output, fmt.Errorf("unknown type %+v for key %q", field.Type.Kind(), hclTag)
+				return output, fmt.Errorf("unknown type %+v for key %q", field.Type.Kind(), hclTag)
 			}
 		}
 	}
 
-	return &output, nil
+	return output, nil
 }
