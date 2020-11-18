@@ -164,7 +164,6 @@ func setListValue(input interface{}, index int, v []interface{}, debugLogger Log
 
 					if val, exists := nestedField.Tag.Lookup("hcl"); exists {
 						nestedHCLValue := test[val]
-						// todo check error
 						setValue(elem.Interface(), nestedHCLValue, j, debugLogger)
 					}
 				}
