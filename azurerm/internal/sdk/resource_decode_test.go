@@ -178,9 +178,7 @@ func TestResourceDecode_NestedOneLevelDeepEmpty(t *testing.T) {
 		},
 		Input: &Type{},
 		Expected: &Type{
-			// Tom, commenting out the below line causes the test to pass. Because, we're passing an empty thing
-			// do we want nothing to be passed into the struct?
-			NestedObject: []Inner{}, // TODO: has to be `[]Inner(nil)` right now
+			NestedObject: []Inner{},
 		},
 	}.test(t)
 }
