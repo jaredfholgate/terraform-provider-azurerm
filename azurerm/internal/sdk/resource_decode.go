@@ -21,6 +21,7 @@ func decodeReflectedType(input interface{}, stateRetriever stateRetriever, debug
 	if reflect.TypeOf(input).Kind() != reflect.Ptr {
 		return fmt.Errorf("need a pointer")
 	}
+
 	objType := reflect.TypeOf(input).Elem()
 	for i := 0; i < objType.NumField(); i++ {
 		field := objType.Field(i)
@@ -38,7 +39,8 @@ func decodeReflectedType(input interface{}, stateRetriever stateRetriever, debug
 			debugLogger.Infof("HCLValue: ", hclValue)
 			debugLogger.Infof("Input Type: ", reflect.ValueOf(input).Elem().Field(i).Type())
 
-			if err := setValue(input, hclValue, i, debugLogger); err != nil {
+			fieldName := reflect.ValueOf(input).Elem().Field(i).String()
+			if err := setValue(input, hclValue, i, fieldName, debugLogger); err != nil {
 				return err
 			}
 		}
@@ -46,7 +48,20 @@ func decodeReflectedType(input interface{}, stateRetriever stateRetriever, debug
 	return nil
 }
 
-func setValue(input, hclValue interface{}, index int, debugLogger Logger) error {
+func setValue(input, hclValue interface{}, index int, fieldName string, debugLogger Logger) (errOut error) {
+	debugLogger.Infof("setting list value for %q..", fieldName)
+	defer func() {
+		if r := recover(); r != nil {
+			debugLogger.Warnf("error setting value for %q: %+v", fieldName, r)
+			out, ok := r.(error)
+			if !ok {
+				return
+			}
+
+			errOut = out
+		}
+	}()
+
 	// TODO: what if the nested type is Computed?
 
 	if v, ok := hclValue.(string); ok {
@@ -54,31 +69,31 @@ func setValue(input, hclValue interface{}, index int, debugLogger Logger) error 
 		debugLogger.Infof("Input %+v", reflect.ValueOf(input))
 		debugLogger.Infof("Input Elem %+v", reflect.ValueOf(input).Elem())
 		reflect.ValueOf(input).Elem().Field(index).SetString(v)
-		return nil
+		return
 	}
 
 	if v, ok := hclValue.(int); ok {
 		debugLogger.Infof("[INT] Decode %+v", v)
 		reflect.ValueOf(input).Elem().Field(index).SetInt(int64(v))
-		return nil
+		return
 	}
 
 	if v, ok := hclValue.(int32); ok {
 		debugLogger.Infof("[INT] Decode %+v", v)
 		reflect.ValueOf(input).Elem().Field(index).SetInt(int64(v))
-		return nil
+		return
 	}
 
 	if v, ok := hclValue.(int64); ok {
 		debugLogger.Infof("[INT] Decode %+v", v)
 		reflect.ValueOf(input).Elem().Field(index).SetInt(v)
-		return nil
+		return
 	}
 
 	if v, ok := hclValue.(float64); ok {
 		debugLogger.Infof("[Float] Decode %+v", v)
 		reflect.ValueOf(input).Elem().Field(index).SetFloat(v)
-		return nil
+		return
 	}
 
 	// Doesn't work for empty bools?
@@ -86,12 +101,12 @@ func setValue(input, hclValue interface{}, index int, debugLogger Logger) error 
 		debugLogger.Infof("[BOOL] Decode %+v", v)
 
 		reflect.ValueOf(input).Elem().Field(index).SetBool(v)
-		return nil
+		return
 	}
 
 	if v, ok := hclValue.(*schema.Set); ok {
-		setListValue(input, index, v.List(), debugLogger)
-		return nil
+		setListValue(input, index, fieldName, v.List(), debugLogger)
+		return
 	}
 
 	if mapConfig, ok := hclValue.(map[string]interface{}); ok {
@@ -104,18 +119,18 @@ func setValue(input, hclValue interface{}, index int, debugLogger Logger) error 
 		if len(mapConfig) > 0 {
 			reflect.ValueOf(input).Elem().Field(index).Set(mapOutput)
 		}
-		return nil
+		return
 	}
 
 	if v, ok := hclValue.([]interface{}); ok {
-		setListValue(input, index, v, debugLogger)
-		return nil
+		setListValue(input, index, fieldName, v, debugLogger)
+		return
 	}
 
-	return nil
+	return
 }
 
-func setListValue(input interface{}, index int, v []interface{}, debugLogger Logger) {
+func setListValue(input interface{}, index int, fieldName string, v []interface{}, debugLogger Logger) {
 	switch fieldType := reflect.ValueOf(input).Elem().Field(index).Type(); fieldType {
 	case reflect.TypeOf([]string{}):
 		stringSlice := reflect.MakeSlice(reflect.TypeOf([]string{}), len(v), len(v))
@@ -164,7 +179,7 @@ func setListValue(input interface{}, index int, v []interface{}, debugLogger Log
 
 					if val, exists := nestedField.Tag.Lookup("hcl"); exists {
 						nestedHCLValue := test[val]
-						setValue(elem.Interface(), nestedHCLValue, j, debugLogger)
+						setValue(elem.Interface(), nestedHCLValue, j, fieldName, debugLogger)
 					}
 				}
 

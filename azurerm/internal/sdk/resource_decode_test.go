@@ -12,18 +12,20 @@ type decodeTestData struct {
 	ExpectError bool
 }
 
+// TODO: Optional & Computed
+
 func TestDecode_TopLevelFieldsRequired(t *testing.T) {
 	type SimpleType struct {
-		String        string    `hcl:"string"`
-		Number        int       `hcl:"number"`
-		Price         float64   `hcl:"price"`
-		Enabled       bool      `hcl:"enabled"`
-		ListOfFloats  []float64 `hcl:"list_of_floats"`
-		ListOfNumbers []int     `hcl:"list_of_numbers"`
-		ListOfStrings []string  `hcl:"list_of_strings"`
-		MapOfBools    map[string]bool   `hcl:"map_of_bools"`
-		MapOfNumbers  map[string]int    `hcl:"map_of_numbers"`
-		MapOfStrings  map[string]string `hcl:"map_of_strings"`
+		String               string             `hcl:"string"`
+		Number               int                `hcl:"number"`
+		Price                float64            `hcl:"price"`
+		Enabled              bool               `hcl:"enabled"`
+		ListOfFloats         []float64          `hcl:"list_of_floats"`
+		ListOfNumbers        []int              `hcl:"list_of_numbers"`
+		ListOfStrings        []string           `hcl:"list_of_strings"`
+		MapOfBools           map[string]bool    `hcl:"map_of_bools"`
+		MapOfNumbers         map[string]int     `hcl:"map_of_numbers"`
+		MapOfStrings         map[string]string  `hcl:"map_of_strings"`
 		ComputedMapOfBools   map[string]bool    `hcl:"computed_map_of_bools" computed:"true"`
 		ComputedMapOfFloats  map[string]float64 `hcl:"computed_map_of_floats" computed:"true"`
 		ComputedMapOfInts    map[string]int     `hcl:"computed_map_of_ints" computed:"true"`
@@ -70,7 +72,7 @@ func TestDecode_TopLevelFieldsRequired(t *testing.T) {
 			String:  "world",
 			Price:   129.99,
 			Enabled: true,
-			Number: 42,
+			Number:  42,
 			ListOfFloats: []float64{
 				1.0,
 				2.0,
@@ -106,13 +108,13 @@ func TestDecode_TopLevelFieldsRequired(t *testing.T) {
 
 func TestDecode_TopLevelFieldsOptional(t *testing.T) {
 	type SimpleType struct {
-		String        string    `hcl:"string"`
-		Number        int       `hcl:"number"`
-		Price         float64   `hcl:"price"`
-		Enabled       bool      `hcl:"enabled"`
-		ListOfFloats  []float64 `hcl:"list_of_floats"`
-		ListOfNumbers []int     `hcl:"list_of_numbers"`
-		ListOfStrings []string  `hcl:"list_of_strings"`
+		String        string            `hcl:"string"`
+		Number        int               `hcl:"number"`
+		Price         float64           `hcl:"price"`
+		Enabled       bool              `hcl:"enabled"`
+		ListOfFloats  []float64         `hcl:"list_of_floats"`
+		ListOfNumbers []int             `hcl:"list_of_numbers"`
+		ListOfStrings []string          `hcl:"list_of_strings"`
 		MapOfBools    map[string]bool   `hcl:"map_of_bools"`
 		MapOfNumbers  map[string]int    `hcl:"map_of_numbers"`
 		MapOfStrings  map[string]string `hcl:"map_of_strings"`
@@ -185,13 +187,13 @@ func TestResourceDecode_NestedOneLevelDeepEmpty(t *testing.T) {
 
 func TestResourceDecode_NestedOneLevelDeepSingle(t *testing.T) {
 	type Inner struct {
-		String        string    `hcl:"string"`
-		Number        int       `hcl:"number"`
-		Price         float64   `hcl:"price"`
-		Enabled       bool      `hcl:"enabled"`
-		ListOfFloats  []float64 `hcl:"list_of_floats"`
-		ListOfNumbers []int     `hcl:"list_of_numbers"`
-		ListOfStrings []string  `hcl:"list_of_strings"`
+		String        string            `hcl:"string"`
+		Number        int               `hcl:"number"`
+		Price         float64           `hcl:"price"`
+		Enabled       bool              `hcl:"enabled"`
+		ListOfFloats  []float64         `hcl:"list_of_floats"`
+		ListOfNumbers []int             `hcl:"list_of_numbers"`
+		ListOfStrings []string          `hcl:"list_of_strings"`
 		MapOfBools    map[string]bool   `hcl:"map_of_bools"`
 		MapOfNumbers  map[string]int    `hcl:"map_of_numbers"`
 		MapOfStrings  map[string]string `hcl:"map_of_strings"`
@@ -275,13 +277,13 @@ func TestResourceDecode_NestedOneLevelDeepSingle(t *testing.T) {
 
 func TestResourceDecode_NestedOneLevelDeepSingleOmittedValues(t *testing.T) {
 	type Inner struct {
-		String        string    `hcl:"string"`
-		Number        int       `hcl:"number"`
-		Price         float64   `hcl:"price"`
-		Enabled       bool      `hcl:"enabled"`
-		ListOfFloats  []float64 `hcl:"list_of_floats"`
-		ListOfNumbers []int     `hcl:"list_of_numbers"`
-		ListOfStrings []string  `hcl:"list_of_strings"`
+		String        string            `hcl:"string"`
+		Number        int               `hcl:"number"`
+		Price         float64           `hcl:"price"`
+		Enabled       bool              `hcl:"enabled"`
+		ListOfFloats  []float64         `hcl:"list_of_floats"`
+		ListOfNumbers []int             `hcl:"list_of_numbers"`
+		ListOfStrings []string          `hcl:"list_of_strings"`
 		MapOfBools    map[string]bool   `hcl:"map_of_bools"`
 		MapOfNumbers  map[string]int    `hcl:"map_of_numbers"`
 		MapOfStrings  map[string]string `hcl:"map_of_strings"`
