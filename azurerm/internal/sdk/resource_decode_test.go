@@ -97,10 +97,11 @@ func TestDecode_TopLevelFieldsRequired(t *testing.T) {
 				"guten":   "tag",
 				"morning": "alvaro",
 			},
-			//ComputedMapOfBools:   map[string]bool{},
-			//ComputedMapOfFloats:  map[string]float64{},
-			//ComputedMapOfInts:    map[string]int{},
-			//ComputedMapOfStrings: map[string]string{},
+			// Because it's Computed, we don't expect anything to be passed back here
+			// ComputedMapOfBools:   map[string]bool{},
+			// ComputedMapOfFloats:  map[string]float64{},
+			// ComputedMapOfInts:    map[string]int{},
+			// ComputedMapOfStrings: map[string]string{},
 		},
 		ExpectError: false,
 	}.test(t)

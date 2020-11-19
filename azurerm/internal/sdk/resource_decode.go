@@ -27,6 +27,7 @@ func decodeReflectedType(input interface{}, stateRetriever stateRetriever, debug
 		field := objType.Field(i)
 		debugLogger.Infof("Field", field)
 
+		// TODO How does this handle Optional/Computed?
 		if val, exists := field.Tag.Lookup("computed"); exists {
 			if val == "true" {
 				continue
