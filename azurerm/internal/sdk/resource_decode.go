@@ -15,6 +15,7 @@ func (rmd ResourceMetaData) Decode(input interface{}) error {
 type stateRetriever interface {
 	Get(key string) interface{}
 	GetOk(key string) (interface{}, bool)
+	GetOkExists(key string) (interface{}, bool)
 }
 
 func decodeReflectedType(input interface{}, stateRetriever stateRetriever, debugLogger Logger) error {
@@ -28,7 +29,10 @@ func decodeReflectedType(input interface{}, stateRetriever stateRetriever, debug
 		debugLogger.Infof("Field", field)
 
 		if val, exists := field.Tag.Lookup("hcl"); exists {
-			hclValue := stateRetriever.Get(val)
+			hclValue, valExists := stateRetriever.GetOkExists(val)
+			if !valExists {
+				continue
+			}
 
 			debugLogger.Infof("HCLValue: ", hclValue)
 			debugLogger.Infof("Input Type: ", reflect.ValueOf(input).Elem().Field(i).Type())

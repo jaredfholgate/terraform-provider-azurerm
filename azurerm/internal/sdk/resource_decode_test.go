@@ -734,3 +734,9 @@ func (td testDataGetter) GetOk(key string) (interface{}, bool) {
 	val, ok := td.values[key]
 	return val, ok
 }
+
+func (td testDataGetter) GetOkExists(key string) (interface{}, bool) {
+	// for the purposes of this test this should be sufficient, maybe?
+	val, ok := td.values[key]
+	return val, ok
+}
