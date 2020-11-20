@@ -27,13 +27,6 @@ func decodeReflectedType(input interface{}, stateRetriever stateRetriever, debug
 		field := objType.Field(i)
 		debugLogger.Infof("Field", field)
 
-		// TODO How does this handle Optional/Computed?
-		if val, exists := field.Tag.Lookup("computed"); exists {
-			if val == "true" {
-				continue
-			}
-		}
-
 		if val, exists := field.Tag.Lookup("hcl"); exists {
 			hclValue := stateRetriever.Get(val)
 
@@ -62,8 +55,6 @@ func setValue(input, hclValue interface{}, index int, fieldName string, debugLog
 			errOut = out
 		}
 	}()
-
-	// TODO: what if the nested type is Computed?
 
 	if v, ok := hclValue.(string); ok {
 		debugLogger.Infof("[String] Decode %+v", v)
@@ -117,9 +108,7 @@ func setValue(input, hclValue interface{}, index int, fieldName string, debugLog
 		}
 
 		// TODO: should we always set this in the future? tests pass so it seems fine
-		if len(mapConfig) > 0 {
-			reflect.ValueOf(input).Elem().Field(index).Set(mapOutput)
-		}
+		reflect.ValueOf(input).Elem().Field(index).Set(mapOutput)
 		return
 	}
 
@@ -172,11 +161,6 @@ func setListValue(input interface{}, index int, fieldName string, v []interface{
 				for j := 0; j < elem.Type().Elem().NumField(); j++ {
 					nestedField := elem.Type().Elem().Field(j)
 					debugLogger.Infof("nestedField ", nestedField)
-					if val, exists := nestedField.Tag.Lookup("computed"); exists {
-						if val == "true" {
-							continue
-						}
-					}
 
 					if val, exists := nestedField.Tag.Lookup("hcl"); exists {
 						nestedHCLValue := test[val]

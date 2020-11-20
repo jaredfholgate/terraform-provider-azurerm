@@ -12,24 +12,18 @@ type decodeTestData struct {
 	ExpectError bool
 }
 
-// TODO: Optional & Computed
-
 func TestDecode_TopLevelFieldsRequired(t *testing.T) {
 	type SimpleType struct {
-		String               string             `hcl:"string"`
-		Number               int                `hcl:"number"`
-		Price                float64            `hcl:"price"`
-		Enabled              bool               `hcl:"enabled"`
-		ListOfFloats         []float64          `hcl:"list_of_floats"`
-		ListOfNumbers        []int              `hcl:"list_of_numbers"`
-		ListOfStrings        []string           `hcl:"list_of_strings"`
-		MapOfBools           map[string]bool    `hcl:"map_of_bools"`
-		MapOfNumbers         map[string]int     `hcl:"map_of_numbers"`
-		MapOfStrings         map[string]string  `hcl:"map_of_strings"`
-		ComputedMapOfBools   map[string]bool    `hcl:"computed_map_of_bools" computed:"true"`
-		ComputedMapOfFloats  map[string]float64 `hcl:"computed_map_of_floats" computed:"true"`
-		ComputedMapOfInts    map[string]int     `hcl:"computed_map_of_ints" computed:"true"`
-		ComputedMapOfStrings map[string]string  `hcl:"computed_map_of_strings" computed:"true"`
+		String        string            `hcl:"string"`
+		Number        int               `hcl:"number"`
+		Price         float64           `hcl:"price"`
+		Enabled       bool              `hcl:"enabled"`
+		ListOfFloats  []float64         `hcl:"list_of_floats"`
+		ListOfNumbers []int             `hcl:"list_of_numbers"`
+		ListOfStrings []string          `hcl:"list_of_strings"`
+		MapOfBools    map[string]bool   `hcl:"map_of_bools"`
+		MapOfNumbers  map[string]int    `hcl:"map_of_numbers"`
+		MapOfStrings  map[string]string `hcl:"map_of_strings"`
 	}
 	decodeTestData{
 		State: map[string]interface{}{
@@ -62,10 +56,6 @@ func TestDecode_TopLevelFieldsRequired(t *testing.T) {
 				"guten":   "tag",
 				"morning": "alvaro",
 			},
-			"computed_map_of_bools":   []interface{}{},
-			"computed_map_of_floats":  []interface{}{},
-			"computed_map_of_ints":    []interface{}{},
-			"computed_map_of_strings": []interface{}{},
 		},
 		Input: &SimpleType{},
 		Expected: &SimpleType{
@@ -97,11 +87,82 @@ func TestDecode_TopLevelFieldsRequired(t *testing.T) {
 				"guten":   "tag",
 				"morning": "alvaro",
 			},
-			// Because it's Computed, we don't expect anything to be passed back here
-			// ComputedMapOfBools:   map[string]bool{},
-			// ComputedMapOfFloats:  map[string]float64{},
-			// ComputedMapOfInts:    map[string]int{},
-			// ComputedMapOfStrings: map[string]string{},
+		},
+		ExpectError: false,
+	}.test(t)
+}
+
+func TestDecode_TopLevelFieldsComputedNoValues(t *testing.T) {
+	// NOTE: this scenario covers Create without any existing Computed values
+	type SimpleType struct {
+		ComputedMapOfBools   map[string]bool    `hcl:"computed_map_of_bools"`
+		ComputedMapOfFloats  map[string]float64 `hcl:"computed_map_of_floats"`
+		ComputedMapOfInts    map[string]int     `hcl:"computed_map_of_ints"`
+		ComputedMapOfStrings map[string]string  `hcl:"computed_map_of_strings"`
+	}
+	decodeTestData{
+		State: map[string]interface{}{
+			"computed_map_of_bools":   map[string]interface{}{},
+			"computed_map_of_floats":  map[string]interface{}{},
+			"computed_map_of_ints":    map[string]interface{}{},
+			"computed_map_of_strings": map[string]interface{}{},
+		},
+		Input: &SimpleType{},
+		Expected: &SimpleType{
+			ComputedMapOfBools:   map[string]bool{},
+			ComputedMapOfFloats:  map[string]float64{},
+			ComputedMapOfInts:    map[string]int{},
+			ComputedMapOfStrings: map[string]string{},
+		},
+		ExpectError: false,
+	}.test(t)
+}
+
+func TestDecode_TopLevelFieldsComputedWithValues(t *testing.T) {
+	// NOTE: this scenario covers Update/Read with existing Computed values or Computed/Optional
+	type SimpleType struct {
+		ComputedMapOfBools   map[string]bool    `hcl:"computed_map_of_bools"`
+		ComputedMapOfFloats  map[string]float64 `hcl:"computed_map_of_floats"`
+		ComputedMapOfInts    map[string]int     `hcl:"computed_map_of_ints"`
+		ComputedMapOfStrings map[string]string  `hcl:"computed_map_of_strings"`
+	}
+	decodeTestData{
+		State: map[string]interface{}{
+			"computed_map_of_bools": map[string]interface{}{
+				"bingo": true,
+				"bango": false,
+			},
+			"computed_map_of_floats": map[string]interface{}{
+				"bingo": -2.197234,
+				"bango": 3.123456789,
+			},
+			"computed_map_of_ints": map[string]interface{}{
+				"bingo": 2197234,
+				"bango": 3123456789,
+			},
+			"computed_map_of_strings": map[string]interface{}{
+				"matthew": "brisket",
+				"tom":     "coffee",
+			},
+		},
+		Input: &SimpleType{},
+		Expected: &SimpleType{
+			ComputedMapOfBools: map[string]bool{
+				"bingo": true,
+				"bango": false,
+			},
+			ComputedMapOfFloats: map[string]float64{
+				"bingo": -2.197234,
+				"bango": 3.123456789,
+			},
+			ComputedMapOfInts: map[string]int{
+				"bingo": 2197234,
+				"bango": 3123456789,
+			},
+			ComputedMapOfStrings: map[string]string{
+				"matthew": "brisket",
+				"tom":     "coffee",
+			},
 		},
 		ExpectError: false,
 	}.test(t)
@@ -133,35 +194,48 @@ func TestDecode_TopLevelFieldsOptional(t *testing.T) {
 			"map_of_numbers":  map[string]interface{}{},
 			"map_of_strings":  map[string]interface{}{},
 		},
-		Input:       &SimpleType{},
-		Expected:    &SimpleType{},
+		Input: &SimpleType{},
+		Expected: &SimpleType{
+			MapOfBools:   map[string]bool{},
+			MapOfNumbers: map[string]int{},
+			MapOfStrings: map[string]string{},
+		},
 		ExpectError: false,
 	}.test(t)
 }
 
 func TestDecode_TopLevelFieldsComputed(t *testing.T) {
 	type SimpleType struct {
-		ComputedString        string   `hcl:"computed_string" computed:"true"`
-		ComputedNumber        int      `hcl:"computed_number" computed:"true"`
-		ComputedBool          bool     `hcl:"computed_bool" computed:"true"`
-		ComputedListOfNumbers []int    `hcl:"computed_list_of_numbers" computed:"true"`
-		ComputedListOfStrings []string `hcl:"computed_list_of_strings" computed:"true"`
-		// TODO: computed maps
+		ComputedString        string   `hcl:"computed_string"`
+		ComputedNumber        int      `hcl:"computed_number"`
+		ComputedBool          bool     `hcl:"computed_bool"`
+		ComputedListOfNumbers []int    `hcl:"computed_list_of_numbers"`
+		ComputedListOfStrings []string `hcl:"computed_list_of_strings"`
 	}
 	decodeTestData{
 		State: map[string]interface{}{
 			"computed_string":          "je suis computed",
 			"computed_number":          int64(732),
 			"computed_bool":            true,
-			"computed_list_of_numbers": []int{1, 2, 3},
-			"computed_list_of_strings": []string{
+			"computed_list_of_numbers": []interface{}{1, 2, 3},
+			"computed_list_of_strings": []interface{}{
 				"have",
 				"you",
 				"heard",
 			},
 		},
-		Input:       &SimpleType{},
-		Expected:    &SimpleType{},
+		Input: &SimpleType{},
+		Expected: &SimpleType{
+			ComputedString:        "je suis computed",
+			ComputedNumber:        732,
+			ComputedBool:          true,
+			ComputedListOfNumbers: []int{1, 2, 3},
+			ComputedListOfStrings: []string{
+				"have",
+				"you",
+				"heard",
+			},
+		},
 		ExpectError: false,
 	}.test(t)
 }
@@ -310,7 +384,11 @@ func TestResourceDecode_NestedOneLevelDeepSingleOmittedValues(t *testing.T) {
 		Input: &Type{},
 		Expected: &Type{
 			NestedObject: []Inner{
-				{},
+				{
+					MapOfBools:   map[string]bool{},
+					MapOfNumbers: map[string]int{},
+					MapOfStrings: map[string]string{},
+				},
 			},
 		},
 	}.test(t)
