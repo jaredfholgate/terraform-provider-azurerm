@@ -835,6 +835,8 @@ func expandArmFrontDoorFrontendEndpoint(input []interface{}, frontDoorId parse.F
 		output = append(output, result)
 	}
 
+	Sort(&output)
+
 	return &output
 }
 
@@ -1243,6 +1245,8 @@ func flattenFrontEndEndpoints(input *[]frontdoor.FrontendEndpoint, frontDoorId p
 	if input == nil {
 		return &results, nil
 	}
+
+	Sort(input)
 
 	for _, item := range *input {
 		id := ""
